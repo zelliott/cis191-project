@@ -1,0 +1,3 @@
+[submodule "chipsandguac"]
+	path = chipsandguac
+	url = https://github.com/jquatier/chipsandguac
