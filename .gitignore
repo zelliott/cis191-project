@@ -4,3 +4,4 @@
 *.DS_Store
 ignore*
 chipotle_venv
+rest_venv
