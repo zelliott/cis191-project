@@ -4,6 +4,8 @@ import json
 LOCATIONS_URL = "https://order.sweetgreen.com/api/restaurants?zip_code="
 MENU_URL = "https://order.sweetgreen.com/api/menus/"
 ORDER_URL = "https://order.sweetgreen.com/api/line_items"
+SIGNUP_URL = "https://order.sweetgreen.com/api/customers/login_or_register"
+LOGIN_URL = "https://order.sweetgreen.com/api/customers/login_or_register"
 
 
 
@@ -24,6 +26,39 @@ def get_menu(rest_id):
     products = j['products']
     d = [{i['name']:i['product_slug']} for i in products]
     return {'menu': d}
+
+
+def create_user(first_name, last_name, email, phone_number, pwd):
+    params = {"customer": {
+        "olo_id": None,
+        "email": email,
+        "password": pwd,
+        "password_confirmation": None,
+        "first_name":first_name,
+        "last_name": last_name,
+        "contact_number":phone_number,
+        "reference": None,
+        "is_rewards_user":False,
+        "has_opted_in": True,
+        "reset_password": False,
+        "last_completed_order_id": None,
+        "billing_account_ids":[],
+        "loyalty_id": None
+    }}
+    r = requests.post(SIGNUP_URL, data=params)
+    return r.json()
+
+
+def sign_in(inp):
+    with requests.Session() as s:
+        params = inp.get('customer')
+        pwd = params.get('password')
+        user = params.get('email')
+        payload = 'customer[email]=' + user + '&customer[password]=' + pwd
+        r = s.post(LOGIN_URL, data=payload)
+        return r
+
+
 
 
 # def place_order(quantity, order_id):
