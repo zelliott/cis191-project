@@ -1,10 +1,11 @@
 import requests
+import json
 
 LOCATIONS_URL = "https://order.sweetgreen.com/api/restaurants?zip_code="
-ORDER_URL = "https://order.sweetgreen.com/api/menus/"
+MENU_URL = "https://order.sweetgreen.com/api/menus/"
+ORDER_URL = "https://order.sweetgreen.com/api/line_items"
 
 
-"/api/menus/id"
 
 def get_location(zip_code):
     response = {}
@@ -18,10 +19,24 @@ def get_location(zip_code):
 
 
 def get_menu(rest_id):
-    r = requests.get(ORDER_URL + str(rest_id))
+    r = requests.get(MENU_URL + str(rest_id))
     j = r.json()
     products = j['products']
     d = [{i['name']:i['product_slug']} for i in products]
     return {'menu': d}
 
-# print get(7)
+
+# def place_order(quantity, order_id):
+#     s = requests.session()
+#     json_obj = {"line_item": {"quantity": 1, "calories": 590, "favorited": False, "is_custom": False, "custom_name": None,
+#                    "permalink": None, "slug": None, "static_cost": None, "additions": None, "removals": None,
+#                    "order_completed": False, "customer_name": None, "ignored_order_id": None, "product_id": "159",
+#                    "order_id": None, "options": [], "restaurant_id": "7"}}
+#     r = requests.post(ORDER_URL, data=json_obj)
+#     print r
+#     return False
+#
+#
+#
+#
+# print place_order(1, 1)

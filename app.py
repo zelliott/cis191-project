@@ -9,16 +9,18 @@ api = Api(app)
 
 class Location(Resource):
     def get(self):
-        restaurants_list = scrape.get_location(19104)
+        zip_code = request.args.get('zipcode')
+        restaurants_list = scrape.get_location(zip_code)
         return jsonify(restaurants=restaurants_list)
 
 class Menu(Resource):
     def get(self):
-        menu = scrape.get_menu(7)
+        rest_id = request.args.get('id')
+        menu = scrape.get_menu(rest_id)
         return jsonify(menu)
 
 
-api.add_resource(Location, '/', endpoint='test')
+api.add_resource(Location, '/location', endpoint='location')
 api.add_resource(Menu, '/menu', endpoint='menu')
 
 if __name__ == "__main__":
