@@ -21,8 +21,7 @@ class Login(Resource):
         # customer = request.args
         inp = request.get_json(force=True)
         login = scrape.sign_in(inp)
-        print login
-        return jsonify(hello="world")
+        return jsonify(login)
 
 
 
