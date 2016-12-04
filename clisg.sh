@@ -1,68 +1,136 @@
 #!/bin/bash
 
-##This bash script takes in inputs for a command-line Sweetgreen ordering program.
-##flags: --createAccount --paymentDetails --login
-## --createAccount: locally stores firstname, lastname, email, password, and phone number to populate creating a new account on sweetgreen.com
-## --paymentDetails: locally stores card number, expiration month, expiration year, CCV code, billing zip 
-## --login: locally stores an email and password, which will be used to log into an account on sweetgreen.com
+# TODO: ZACK:
+# The below code is being kept for reference
+# and should not be uncommented.
 
-firstname=null
-lastname=null
-email=null
-password=null
-phonenumber=null
-cardnumber=null
-exp_month=null
-exp_year=null
-ccv_code=null
-billing_zip=null
-zipcode=null
-pickup_time=null
-bowl_type=null
+# email=${userData[0]}
+# password=${userData[1]}
+# cardNo=${userData[2]}
+# expMo=${userData[3]}
+# expYr=${userData[4]}
+# cvv=${userData[5]}
+# postalCode=${userData[6]}
+# contactNum=${userData[7]}
 
-case $# in
-	1)
-	case $1 in
-		-createAccount)
-			echo "You need to create an account before you can order from SG."
-			echo "Please provide firstname, lastname, email, password, and phone number you want to use to create your account."
-		i	read firstname_in lastname_in email_in password_in phonenumber_in
-			firstname=$firstname_in
-			lastname=$lastname_in
-			email=$email_in
-			password=$password_in
-			phonenumber=$phonenumber_in
-		;;
-		-paymentDetails)
-			echo "Please provide payment details: card number, expiration month, exp. year, CCV code, and billing zip."
-			read cardnumber_in exp_month_in exp_year_in ccv_code_in billing_zip_in
-			cardnumber=$cardnumber_in
-			exp_month=$exp_month_in
-			exp_year=$exp_year_in
-			ccv_code=$ccv_code_in
-			billing_zip=$billing_zip_in
-		;;
-		-login)
-			echo "Please provide email, then password."
-			read email_in password_in
-			
-			email=$email_in
-			password=$password_in	
-		;;
-		esac
-	;;
-	0)
-		echo "Please provide your ZIP code, desired pickup time (no spaces), and bowl_type."
-		read zipcode_in pickup_time_in bowl_type_in
-		
-		##TODO-- regex to parse pickup time, bowl_type
-		
-		zipcode=$zipcode_in
-		pickup_time=$pickup_time_in
-		bowl_type=$bowl_type_in
-	;;
+function performOrder {
+	echo "Enter your zip code:"
+	read -p "> " zipCode
+
+	# Get locations
+	locations="$(python ./api/getLocationsFromZipCode.py $zipCode)"
+
+	# Error handling if no locations
+	if [ -z "$locations" ]
+	then
+		echo "No locations for this zip code"
+		exit
+	fi
+
+	# Choose location
+	echo "Choose a location from the below list:"
+	i=$((0))
+	for location in $locations
+	do
+		echo "$i) $location"
+		i=$(($i+1))
+	done
+	read -p "> " locationNo
+
+	# Validate location choice
+	locationNo=$(($locationNo + 0))
+	if [ $locationNo -le 0 -a $locationNo -ge $((i)) ]
+	then
+		echo "Invalid zip code choice."
+		exit
+	fi
+
+	# Get menu
+	menu="$(python ./api/getMenuFromLocation.py $zipCode $locationNo)"
+
+	# Error handling if no menu
+	if [ -z "$menu" ]
+	then
+		echo "No menu for this location"
+		exit
+	fi
+
+	# Choose menu item
+	echo "Choose a salad from the below list:"
+	i=$((0))
+	for item in $menu
+	do
+		echo "$i) $item"
+		i=$(($i+1))
+	done
+	read -p "> " itemNo
+
+	# Validate item choice
+	itemNo=$(($itemNo + 0))
+	if [ $itemNo -le 0 -a $itemNo -ge $((i)) ]
+	then
+		echo "Invalid item choice."
+		exit
+	fi
+
+	# Choose pickup time
+	echo "Choose a pickup time:"
+	pickupTimes="$(python ./api/getPickupTimes.py)"
+	i=$((0))
+	for time in $pickupTimes
+	do
+		echo "$i) $time"
+		i=$(($i+1))
+	done
+	read -p "> " timeNo
+
+	# Validate time choice
+	timeNo=$(($timeNo + 0))
+	if [ $timeNo -le 0 -a $timeNo -ge $((i)) ]
+	then
+		echo "Invalid time choice."
+		exit
+	fi
+
+	# Prompt for password to confirm order
+	echo "Enter your sweetgreen password to confirm your order:"
+	read -p "> " password
+
+	# Validate password & get user data
+	order="$(python ./api/confirmOrder.py $password)"
+
+	order=$(($order + 0))
+	if [ $order -eq 0 ]
+	then
+		echo "Order failed"
+		exit
+	else
+		echo "Order submitted"
+	fi
+}
+
+function performAddAccount() {
+	echo "Add account"
+}
+
+function performAddPayment() {
+	echo "Add payment"
+}
+
+if [[ $# -eq 0 ]]
+then
+	echo "Specify a command"
+else
+	case ${1} in
+		"--order")
+			performOrder
+			;;
+		"--addAccount")
+			performAddAccount
+			;;
+		"--addPayment")
+			performAddPayment
+			;;
 	esac
+fi
 
-
-
-##Raghav call python web req script from here using variables above as command-line args
