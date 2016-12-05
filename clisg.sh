@@ -46,7 +46,7 @@ function performOrder {
 	fi
 
 	# Get menu
-	menu="$(python ./api/getMenuFromLocation.py $zipCode $locationNo)"
+	menu="$(python ./api/getMenuFromLocation.py $locationNo)"
 
 	# Error handling if no menu
 	if [ -z "$menu" ]
@@ -73,9 +73,18 @@ function performOrder {
 		exit
 	fi
 
+	# Get pickupTimes
+	pickupTimes="$(python ./api/getPickupTimesFromItem.py $itemNo)"
+
+	# Error handling if no pickup times
+	if [ -z "$pickupTimes" ]
+	then
+		echo "No pickup times for this item"
+		exit
+	fi
+
 	# Choose pickup time
 	echo "Choose a pickup time:"
-	pickupTimes="$(python ./api/getPickupTimes.py)"
 	i=$((0))
 	for time in $pickupTimes
 	do
@@ -97,7 +106,7 @@ function performOrder {
 	read -p "> " password
 
 	# Validate password & get user data
-	order="$(python ./api/confirmOrder.py $password)"
+	order="$(python ./api/confirmOrder.py $timeNo $password)"
 
 	order=$(($order + 0))
 	if [ $order -eq 0 ]
@@ -117,6 +126,16 @@ function performAddPayment() {
 	echo "Add payment"
 }
 
+mkfifo /tmp/sgcli-send
+cat > /tmp/sgcli-send &
+sendPid=$!
+
+mkfifo /tmp/sgcli-receive
+cat > /tmp/sgcli-receive &
+receivePid=$!
+
+python runner.py &
+
 if [[ $# -eq 0 ]]
 then
 	echo "Specify a command"
@@ -134,3 +153,5 @@ else
 	esac
 fi
 
+kill $sendPid
+kill $receivePid

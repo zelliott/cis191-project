@@ -9,7 +9,7 @@ It kicks off the `app.py` program (which handles all communication with sweetgre
 
 Handles all communication with sweetgreen.  Input is sent to this program through 'named pipes' via the methods in `/api`.  This program outputs back to the `/api` functions.
 
-#### /api
+#### api/
 
 These functions are called by `clisg.sh`, send data to `app.py`, and print data back for `clisg.sh` to work with.
 
