@@ -86,5 +86,3 @@ class Order(object):
             # final_order = s.post()
 
             return checkout.json()
-
-order = Order()

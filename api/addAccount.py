@@ -1,11 +1,9 @@
 import sys
 import os
 import json
+import imp
 
-from saver.secure_saver import SecureSaver
-
-# I don't know why I made each of these a separate variable, ridiculous
-# hoenstly but at least it's clear what everything is...
+saver = imp.load_source('saver', 'saver/secure_saver.py')
 
 email = sys.argv[1]
 password = sys.argv[2]
@@ -16,8 +14,8 @@ cvv = sys.argv[6]
 postalCode = sys.argv[7]
 contactNum = sys.argv[8]
 
-saver = SecureSaver(password)
-salt = saver.getField('salt', password)
+SGSaver = saver.SecureSaver(password)
+salt = SGSaver.getField('salt', password)
 
 data = {
   'email': email,
@@ -31,6 +29,6 @@ data = {
   'contactNum': contactNum
 }
 
-saver.saveData(data, password)
+SGSaver.saveData(data, password)
 
 print '1'

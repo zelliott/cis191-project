@@ -8,7 +8,7 @@ while True:
         data = send_fifo.read().split()
 
         if len(data) == 0:
-            continue;
+            continue
 
         flag = data[0]
 
@@ -18,7 +18,9 @@ while True:
             # Returns: A list of space-separated locations
             #   e.g. 'LocationA LocationB LocationC...'
             zipCode = data[1]
+
             order.get_location(zipCode)
+
             toSend = ' '.join(order.locations['name'])
 
         elif flag == '--getMenu':
@@ -27,10 +29,12 @@ while True:
             # Returns: A list of space-separated menu items
             #   e.g. 'ItemA ItemB ItemC...'
             locationNo = data[1]
+
             rest_id = order.locations['id'][int(locationNo)]
             menu_items = order.get_menu(rest_id)
             options = [i.keys()[0] for i in menu_items['menu']]
             order_options = [i.replace(" ", "_") for i in options]
+
             toSend = ' '.join(order_options)
 
         elif flag == '--getPickupTimes':

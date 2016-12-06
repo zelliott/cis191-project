@@ -2,6 +2,8 @@ import os
 import errno
 import json
 import hashlib, uuid
+import base64
+from itertools import cycle, izip
 
 class SecureSaver:
 
@@ -9,6 +11,7 @@ class SecureSaver:
     self.foldername = '.sgcli/'
     self.filename = 'data.json'
     self.path = self.foldername + self.filename
+    self.password = password
     self.emptyData = {
       'email': 'None',
       'password': 'None',
@@ -36,6 +39,27 @@ class SecureSaver:
       # SecureSaver.
       pass
 
+  def encryptField(self, value):
+    return ''.join(chr(ord(c)^ord(k)) for c,k in izip(value, cycle(self.password)))
+
+  def encryptData(self, data):
+    for field, value in data.iteritems():
+      if field != 'salt' and field != 'password':
+        data[field] = self.encryptField(value)
+
+    return data
+
+  def decryptField(self, value):
+    return ''.join(chr(ord(c)^ord(k)) for c,k in izip(value, cycle(self.password)))
+
+  def decryptData(self, data):
+    for field, value in data.iteritems():
+      if field != 'salt' and field != 'password':
+        data[field] = self.decryptField(value)
+
+    return data
+
+
   def confirmPassword(self, password):
     if os.path.exists(self.path):
       f = open(self.path, 'r')
@@ -58,14 +82,20 @@ class SecureSaver:
 
     data = self.getData(password)
     data[field] = value
+
     self.saveData(data, password)
 
   def saveData(self, data, password):
     self.confirmPassword(password)
 
+    savedData = self.getData(password)
+
+    data['password'] = savedData['password']
+    data['salt'] = savedData['salt']
+
     if os.path.exists(self.path):
       f = open(self.path, 'w')
-      json.dump(data, f)
+      json.dump(self.encryptData(data), f)
       f.close()
     else:
       raise Exception('Not found: .sgcli/data.json')
@@ -81,7 +111,7 @@ class SecureSaver:
 
     if os.path.exists(self.path):
       f = open(self.path, 'r')
-      data = json.load(f)
+      data = self.decryptData(json.load(f))
       f.close()
 
       return data
