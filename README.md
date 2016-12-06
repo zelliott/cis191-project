@@ -56,14 +56,15 @@ Our team has built a command-line program for ordering from Sweetgreen.  This pr
 * **Scheduled Orders:**  The ability to create a cron job to submit an order at a particular date/time.
 * **Command-Line Interface:** An easy to understand CLI for specifying all aspects of ordering.  For example, users will be able to specify menu items (e.g. salad types, sides, drinks, etc...), specific customizations, as well as other details of their order (e.g. type of payment, location, special instructions).
 
-*Note:*
+*Notes:*
 
 Our project proposal changed to ordering from Sweetgreen from ordering to Chipotle because Chipotle's online ordering portal was offline for maintenance this last weekend.  Given that our group was not sure when the portal would be back up, we decided that it would be a smart idea to switch to a different restaurant.  We chose Sweetgreen because, although they do not have an "official" API, many of the requests being made on their website are prefixed with `/api/`, and thus it seemed like we would be able to identify which to use.
+
+Additionally, our team has run into some unexpected difficulties placing the final order with Sweetgreen.  Sweetgreen expects that the payment information and the user credentials are encrypted in a certain way.  We are working on reverse-engineering exactly how to create our request payload so that Sweetgreen validates and accepts it.
 
 ## Project Structure:
 
 Overall program flow can be visualized as follows.  Each individual component is described in more detail below:
-
 
 1. User calls program: `$ ./sgcli.sh [some command flag]`
 2. Corresponding action script is run: `sgcli.sh --> actions/[some action]`
@@ -74,8 +75,6 @@ Overall program flow can be visualized as follows.  Each individual component is
 7. This process pipes response back to API endpoint: `sgrunner.py --> api/[some request for data]`
 8. Action script grabs output from API endpoint: `api/[some request for data] --> actions/[some action]`
 9. User is prompted for additional input, and steps 3-8 continue until action is completed.
-
-
 
 #### sgcli.sh
 
