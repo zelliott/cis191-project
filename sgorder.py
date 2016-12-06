@@ -41,21 +41,19 @@ class Order(object):
         self.menu = {'menu': d}
         return self.menu
 
-    ##SG allows for pickup times every half-hour the store is open up until close of the subsequent day.
     def get_times(self, rest_id):
-	self.rest_id = rest_id
-	r = requests.get(LOCATIONS_URL + str(self.zip)
-	j = r.json()
-	j = j['restaurants']
-	for i in restaurants:
-		if i['id'] == self.rest_id:
-			restaurant_entry = i
-			break
-	hours = restaurant_entry['hours']
-	print(hours) ## TODO-- test
-	self.hours = hours
-	return self.hours
-		
+        self.rest_id = rest_id
+        r = requests.get(LOCATIONS_URL + str(self.zip))
+        j = r.json()
+        j = j['restaurants']
+        for i in restaurants:
+            if i['id'] == self.rest_id:
+                restaurant_entry = i
+                break
+        hours = restaurant_entry['hours']
+        self.hours = hours
+        return self.hours
+
     def sign_in(self, inp):
         with requests.Session() as s:
             params = inp.get('customer')
