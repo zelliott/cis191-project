@@ -42,7 +42,7 @@ while True:
       toSend = '1'
 
     else:
-      raise Exeception('Do not recognize api call')
+      raise Exception('Do not recognize api call')
 
     with open('/tmp/sgcli-receive', 'w') as receive_fifo:
       receive_fifo.write(toSend)
