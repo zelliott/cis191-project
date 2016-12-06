@@ -88,3 +88,7 @@ I worked on a number of different pieces, listed below:
 * I created the SecureSaver class in `saver/` to handle securely storing sensitive user information on one's computer.  This turned out to be more difficult than I initially envisioned.
 * I created the logic to create and remove cronjobs.
 * I created the helper functions in `api/` to for our shell script to communicate with the the Python class actually interacting with Sweetgreen's API.
+
+
+### Alessandro:
+I focused on the central shell script-- specifically, on implementing user I/O: parsing script flags and implementing the various flag cases, parsing and storing command-line user input, and validating user input and displaying success/error messages.
