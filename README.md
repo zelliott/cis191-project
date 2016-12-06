@@ -66,9 +66,9 @@ Our program runs through the shell script `sgcli.sh`, which kicks off all other 
 
 #### sgrunner.py
 
-This Python script is called by `sgcli.sh`, and essentially just loops in a non-blocking read loop, reading input from the pipe `/tmp/sgcli-send`.  Whenever input comes in, it parses the input to determine what it should do, and what it should send back to the pipe `/tmp/sgcli-receive`.  For example, if the input `--getLocations 19104` is sent to `sgrunner.py`, then the program parses `--getLocations` to determine that it should return a list of restaurant locations specific to that particular zip code.  Thus, this script can be thought of as the middleman between `sgcli.sh` (which handles all I/O with the user) and `scrape.py` (which actually performs all of the hard work of making requests to Sweetgreen's API).
+This Python script is called by `sgcli.sh`, and essentially just loops in a non-blocking read loop, reading input from the pipe `/tmp/sgcli-send`.  Whenever input comes in, it parses the input to determine what it should do, and what it should send back to the pipe `/tmp/sgcli-receive`.  For example, if the input `--getLocations 19104` is sent to `sgrunner.py`, then the program parses `--getLocations` to determine that it should return a list of restaurant locations specific to that particular zip code.  Thus, this script can be thought of as the middleman between `sgcli.sh` (which handles all I/O with the user) and `sgorder.py` (which actually performs all of the hard work of making requests to Sweetgreen's API).
 
-#### scrape.py
+#### sgorder.py
 
 As mentioned above, this script holds all logic regarding making requests to Sweetgreen's various endpoints, parsing response JSON, and sending that data back to `sgrunner.py` to eventually be piped back to `sgcli.sh`.
 

@@ -8,7 +8,6 @@ LOGIN_URL = "https://order.sweetgreen.com/api/customers/login_or_register"
 ORDER_URL = "https://order.sweetgreen.com/api/orders?"
 CHECKOUT_URL = "https://order.sweetgreen.com/api/orders/"
 
-
 class Order(object):
     """docstring for Order"""
 
