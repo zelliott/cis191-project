@@ -117,6 +117,8 @@ I worked on a number of different pieces, listed below:
 
 I focused on the central shell script-- specifically, on implementing user I/O: parsing script flags and implementing the various flag cases, parsing and storing command-line user input, and validating user input and displaying success/error messages.
 
+I also implemented the get_times Sweetgreen API call in sgorder.py, along with its corresponding parsing and formatting in its helper function in sgrunner.py. Get_times gets a store's hours, given a restaurant-id, and outputs a list of possible order pickup times based on those store hours.
+
 ### Raghav:
 I wrote the Order class contained in sgorder.py (originally named scraper.py) which performs all of the Sweetgreen API calls:
 * Given a zip-code, gets the closest sweetgreen locations nearby (provides JSON object containing IDs, addresses, and restaurants)
