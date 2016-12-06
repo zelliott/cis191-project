@@ -1,4 +1,8 @@
-Group Members: Zack Elliott, Alessandro Portela, Raghav Joshi
+# sgcli
+
+A sweetgreen CLI for ordering from Sweetgreen
+
+Created by: Zack Elliott, Alessandro Portela, Raghav Joshi
 
 ## To Run:
 
@@ -40,7 +44,7 @@ Remove a scheduled order:
 $ ./sgcli.sh --removeScheduledOrder
 ```
 
-### Project Description / Goals:
+## Project Description / Goals:
 
 Our team has built a command-line program for ordering from Sweetgreen.  This program includes the following major components:
 
@@ -54,7 +58,7 @@ Our team has built a command-line program for ordering from Sweetgreen.  This pr
 
 Our project proposal changed to ordering from Sweetgreen from ordering to Chipotle because Chipotle's online ordering portal was offline for maintenance this last weekend.  Given that our group was not sure when the portal would be back up, we decided that it would be a smart idea to switch to a different restaurant.  We chose Sweetgreen because, although they do not have an "official" API, many of the requests being made on their website are prefixed with `/api/`, and thus it seemed like we would be able to identify which to use.
 
-### Project Structure:
+## Project Structure:
 
 #### sgcli.sh
 

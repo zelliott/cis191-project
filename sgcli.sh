@@ -1,18 +1,5 @@
 #!/bin/bash
 
-# TODO: ZACK:
-# The below code is being kept for reference
-# and should not be uncommented.
-
-# email=${userData[0]}
-# password=${userData[1]}
-# cardNo=${userData[2]}
-# expMo=${userData[3]}
-# expYr=${userData[4]}
-# cvv=${userData[5]}
-# postalCode=${userData[6]}
-# contactNum=${userData[7]}
-
 function performOrder() {
 	flag=$1
 
@@ -77,7 +64,7 @@ function performOrder() {
 
 	# If this is a scheduled order, we have to handle things
 	# slightly differently via cronjobs
-	if [ $flag = "-s" ]
+	if [ "$flag" == "-s" ]
 	then
 		performScheduledOrder $zipCode $locationNo $itemNo
 		exit
@@ -307,10 +294,6 @@ function performChangeAccount() {
 		echo "Account was successfully changed"
 	fi
 }
-
-# function performAddPayment() {
-# 	echo "Add payment"
-# }
 
 mkfifo /tmp/sgcli-send
 cat > /tmp/sgcli-send &
