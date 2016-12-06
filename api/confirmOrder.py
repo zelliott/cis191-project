@@ -19,5 +19,5 @@ while True:
     data = receive_fifo.read()
 
     if not data == '':
-      print '1'
+      print data
       break

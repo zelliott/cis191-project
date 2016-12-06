@@ -9,7 +9,11 @@ flag = sys.argv[1][2:]
 value = sys.argv[2]
 password = sys.argv[3]
 
-SGSaver = saver.SecureSaver(password)
-SGSaver.saveField(flag, value, password)
+try:
+  SGSaver = saver.SecureSaver(password)
+  SGSaver.saveField(flag, value, password)
 
-print '1'
+  print '1'
+except Exception:
+  print '0'
+  pass

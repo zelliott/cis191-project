@@ -16,8 +16,7 @@ def getLocationsFromZipCode(zipCode):
 
 # Helper function used to interface with sgorder.py
 def getMenuFromLocation(locationNo):
-    restId = SGOrder.locations['id'][int(locationNo)]
-    menuItems = SGOrder.get_menu(restId)
+    menuItems = SGOrder.get_menu(locationNo)
     options = [i.keys()[0] for i in menuItems['menu']]
     orderOptions = [i.replace(' ', '_') for i in options]
 
@@ -26,14 +25,13 @@ def getMenuFromLocation(locationNo):
 # Helper function used to interface with sgorder.py
 def getPickupTimesFromItem(itemNo):
 
-    # restId = SGOrder.locations['id'][int(locationNo)]
-    # storeHours = SGOrder.get_times(restId)
+    storeHours = SGOrder.get_times()
 
     # TODO:
     # Use store hours to print out half-hour intervals while store is open from
     # Current day/time to closing time of subsequent day
 
-    return '5:00 5:30 6:00'
+    return '3:00 3:30 4:00 4:30 5:00 5:30 6:00 6:30'
 
 # Helper function used to interface with sgorder.py
 def confirmOrder(timeNo, password):

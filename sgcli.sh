@@ -74,7 +74,7 @@ fi
 rmPipes $sendPipe $receivePipe
 
 disown $sendPid
-kill -9 $sendPid
+kill -9 $sendPid &> /dev/null
 disown $receivePid
-kill -9 $receivePid
+kill -9 $receivePid &> /dev/null
 pkill -f sgrunner.py > /dev/null

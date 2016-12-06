@@ -18,6 +18,7 @@ class Order(object):
         self.rest_id = None
         self.menu = None
         self.zip = None
+        self.restaurants = None
 	self.hours = None
 
     def get_location(self, zip_code):
@@ -25,28 +26,27 @@ class Order(object):
         response = {}
         loc_url = LOCATIONS_URL + str(self.zip)
         r = requests.get(loc_url).json()
-        restaurants = r['restaurants']
-        response['name'] = [i['restaurant_slug'] for i in restaurants]
-        response['id'] = [i['id'] for i in restaurants]
-        response['merged'] = [{i['restaurant_slug']: i['id']} for i in restaurants]
+        self.restaurants = r['restaurants']
+        response['name'] = [i['restaurant_slug'] for i in self.restaurants]
+        response['id'] = [i['id'] for i in self.restaurants]
+        response['merged'] = [{i['restaurant_slug']: i['id']} for i in self.restaurants]
         self.locations = response
         return self.locations
 
-    def get_menu(self, rest_id):
-        self.rest_id = rest_id
-        r = requests.get(MENU_URL + str(rest_id))
+    def get_menu(self, location_no):
+        self.rest_id = self.locations['id'][int(location_no)]
+        r = requests.get(MENU_URL + str(self.rest_id))
         j = r.json()
         products = j['products']
         d = [{i['name']: i['product_slug']} for i in products]
         self.menu = {'menu': d}
         return self.menu
 
-    def get_times(self, rest_id):
-        self.rest_id = rest_id
+    def get_times(self):
         r = requests.get(LOCATIONS_URL + str(self.zip))
         j = r.json()
         j = j['restaurants']
-        for i in restaurants:
+        for i in self.restaurants:
             if i['id'] == self.rest_id:
                 restaurant_entry = i
                 break

@@ -19,19 +19,19 @@ function performScheduledOrder() {
 	imo=$(($mo + 0))
 	idom=$(($dom + 0))
 
-	if [ \( $idow -l 0 -o $idow -g 6 \) -a \( $dow != "*" \) ]
+	if [ \( $idow -lt 0 -o $idow -gt 6 \) -a \( $dow != "*" \) ]
 	then
 		echo "Invalid day of week."
 		exit
 	fi
 
-	if [ \( $imo -l 1 -o $imo -g 12 \) -a \( $mo != "*" \) ]
+	if [ \( $imo -lt 1 -o $imo -gt 12 \) -a \( $mo != "*" \) ]
 	then
 		echo "Invalid month."
 		exit
 	fi
 
-	if [ \( $idom -l 1 -o $idom -g 31 \) -a \( $dom != "*" \) ]
+	if [ \( $idom -lt 1 -o $idom -gt 31 \) -a \( $dom != "*" \) ]
 	then
 		echo "Invalid day of month."
 		exit

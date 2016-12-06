@@ -29,7 +29,7 @@ function performOrder() {
 
 	# Validate location choice
 	locationNo=$(($locationNo + 0))
-	if [ $locationNo -le 0 -a $locationNo -ge $((i)) ]
+	if [ $locationNo -lt 0 -o $locationNo -gt $(($i-1)) ]
 	then
 		echo "Invalid zip code choice."
 		exit
@@ -57,7 +57,7 @@ function performOrder() {
 
 	# Validate item choice
 	itemNo=$(($itemNo + 0))
-	if [ $itemNo -le 0 -a $itemNo -ge $((i)) ]
+	if [ $itemNo -lt 0 -o $itemNo -gt $(($i-1)) ]
 	then
 		echo "Invalid item choice."
 		exit
@@ -93,7 +93,7 @@ function performOrder() {
 
 	# Validate time choice
 	timeNo=$(($timeNo + 0))
-	if [ $timeNo -le 0 -a $timeNo -ge $((i)) ]
+	if [ $timeNo -lt 0 -o $timeNo -gt $(($i-1)) ]
 	then
 		echo "Invalid time choice."
 		exit
