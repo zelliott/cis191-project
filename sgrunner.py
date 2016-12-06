@@ -24,10 +24,13 @@ def getMenuFromLocation(locationNo):
     return ' '.join(orderOptions)
 
 # Helper function used to interface with sgorder.py
-def getPickupTimesFromItem(itemNo):
+def getPickupTimesFromLocation(locationNo):
 
-    # TODO:
-    # Add API call
+    restId = SGOrder.locations['id'][int(locationNo)]
+    storeHours = SGOrder.get_times(restId)
+
+    ##TODO-- use store hours to print out half-hour intervals while store is open from
+    ##current day/time to closing time of subsequent day
 
     return '5:00 5:30 6:00'
 
