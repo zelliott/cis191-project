@@ -28,6 +28,18 @@ Place an order:
 $ ./sgcli.sh --order
 ```
 
+Place a scheduled order:
+
+```
+$ ./sgcli.sh --scheduledOrder
+```
+
+Remove a scheduled order:
+
+```
+$ ./sgcli.sh --removeScheduledOrder
+```
+
 ### Project Description / Goals:
 
 Our team has built a command-line program for ordering from Sweetgreen.  This program includes the following major components:
@@ -46,19 +58,19 @@ Our project proposal changed to ordering from Sweetgreen from ordering to Chipot
 
 #### sgcli.sh
 
-Our program runs through the shell script `sgcli.sh`, which kicks off all other helping programs/scripts.  First, this script sets up two *named pipes* called `/tmp/sgcli-send` and `/tmp/sgcli-receive`.  These pipes are used by our various Python scripts to communicate to one another.  Second, it kicks off `runner.py` in the background.  Third, it handles all user I/O in our program.  This involves (1) parsing command line arguments such as `--order` and `--addAccount`, (2) reading user input and sending it to the various Python scripts, and (3) validating user input and displaying success/error messages.  Finally, this script cleans up all processes and pipes it creates at the end of running.
+Our program runs through the shell script `sgcli.sh`, which kicks off all other helping programs/scripts.  First, this script sets up two *named pipes* called `/tmp/sgcli-send` and `/tmp/sgcli-receive`.  These pipes are used by our various Python scripts to communicate to one another.  Second, it kicks off `sgrunner.py` in the background.  Third, it handles all user I/O in our program.  This involves (1) parsing command line arguments such as `--order` and `--addAccount`, (2) reading user input and sending it to the various Python scripts, and (3) validating user input and displaying success/error messages.  Fourth, it handles creating and removing cronjobs for scheduled orders.  Finally, this script cleans up all processes and pipes it creates at the end of running.
 
-#### runner.py
+#### sgrunner.py
 
-This Python script is called by `sgcli.sh`, and essentially just loops in a non-blocking read loop, reading input from the pipe `/tmp/sgcli-send`.  Whenever input comes in, it parses the input to determine what it should do, and what it should send back to the pipe `/tmp/sgcli-receive`.  For example, if the input `--getLocations 19104` is sent to `runner.py`, then the program parses `--getLocations` to determine that it should return a list of restaurant locations specific to that particular zip code.  Thus, this script can be thought of as the middleman between `sgcli.sh` (which handles all I/O with the user) and `scrape.py` (which actually performs all of the hard work of making requests to Sweetgreen's API).
+This Python script is called by `sgcli.sh`, and essentially just loops in a non-blocking read loop, reading input from the pipe `/tmp/sgcli-send`.  Whenever input comes in, it parses the input to determine what it should do, and what it should send back to the pipe `/tmp/sgcli-receive`.  For example, if the input `--getLocations 19104` is sent to `sgrunner.py`, then the program parses `--getLocations` to determine that it should return a list of restaurant locations specific to that particular zip code.  Thus, this script can be thought of as the middleman between `sgcli.sh` (which handles all I/O with the user) and `scrape.py` (which actually performs all of the hard work of making requests to Sweetgreen's API).
 
 #### scrape.py
 
-As mentioned above, this script holds all logic regarding making requests to Sweetgreen's various endpoints, parsing response JSON, and sending that data back to `runner.py` to eventually be piped back to `sgcli.sh`.
+As mentioned above, this script holds all logic regarding making requests to Sweetgreen's various endpoints, parsing response JSON, and sending that data back to `sgrunner.py` to eventually be piped back to `sgcli.sh`.
 
 #### api/
 
-These Python programs are simply helper methods used by `sgcli.sh` and `runner.py` to send data back and forth through the pipes.  They're not super interesting.
+These Python programs are simply helper methods used by `sgcli.sh` and `sgrunner.py` to send data back and forth through the pipes.  They're not super interesting.
 
 #### saver/secure_saver.py
 
@@ -70,4 +82,9 @@ Additionally, all data other than the password and the salt are encrypted using 
 
 ### Zack:
 
-I worked primarily on the central shell script, securely saving user data on the computer, and helping Raghav parse Sweetgreen requests/responses and general API.
+I worked on a number of different pieces, listed below:
+* I helped to plan out the general strategy / program flow for this project.  There are a number of different moving pieces (multiple scripts running, making requests to an external API, creating/destroying files, etc...) that needed to be syncronized together properly.
+* I helped to create the central `sgcli.sh` runner, including adding logic to read user input, create pipes and spawn background processes, create/destroy cronjobs, validate user input, etc...
+* I created the SecureSaver class in `saver/` to handle securely storing sensitive user information on one's computer.  This turned out to be more difficult than I initially envisioned.
+* I created the logic to create and remove cronjobs.
+* I created the helper functions in `api/` to for our shell script to communicate with the the Python class actually interacting with Sweetgreen's API.

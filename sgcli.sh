@@ -13,7 +13,9 @@
 # postalCode=${userData[6]}
 # contactNum=${userData[7]}
 
-function performOrder {
+function performOrder() {
+	flag=$1
+
 	echo "Enter your zip code:"
 	read -p "> " zipCode
 
@@ -73,6 +75,14 @@ function performOrder {
 		exit
 	fi
 
+	# If this is a scheduled order, we have to handle things
+	# slightly differently via cronjobs
+	if [ $flag = "-s" ]
+	then
+		performScheduledOrder $zipCode $locationNo $itemNo
+		exit
+	fi
+
 	# Get pickupTimes
 	pickupTimes="$(python ./api/getPickupTimesFromItem.py $itemNo)"
 
@@ -116,6 +126,82 @@ function performOrder {
 	else
 		echo "Order submitted"
 	fi
+}
+
+function performScheduledOrder() {
+	zipCode=$1
+	locationNo=$2
+	itemNo=$3
+
+	min=$((0))
+	hr=$((1))
+
+	echo "Please specify when this order should be scheduled as follows:"
+	echo "Day of wk (0-6 or *) Month (1 - 12 or *) Day of month (1 - 31 or *)"
+	echo "(e.g. > 0 9 20)"
+	read -p "> " dow mo dom
+
+	# Validate schedule
+	idow=$(($dow + 0))
+	imo=$(($mo + 0))
+	idom=$(($dom + 0))
+
+	if [ \( $idow -l 0 -o $idow -g 6 \) -a \( $dow != "*" \) ]
+	then
+		echo "Invalid day of week."
+		exit
+	fi
+
+	if [ \( $imo -l 1 -o $imo -g 12 \) -a \( $mo != "*" \) ]
+	then
+		echo "Invalid month."
+		exit
+	fi
+
+	if [ \( $idom -l 1 -o $idom -g 31 \) -a \( $dom != "*" \) ]
+	then
+		echo "Invalid day of month."
+		exit
+	fi
+
+	pickupTimes="11:00am 12:00pm 1:00pm 2:00pm 3:00pm 4:00pm 5:00pm 6:00pm 7:00pm 8:00pm 9:00pm"
+
+		# Choose pickup time
+	echo "Choose a pickup time:"
+	i=$((0))
+	for time in $pickupTimes
+	do
+		echo "$i) $time"
+		i=$(($i+1))
+	done
+	read -p "> " timeNo
+
+	# Validate time choice
+	timeNo=$(($timeNo + 0))
+	if [ $timeNo -le 0 -a $timeNo -ge $((i)) ]
+	then
+		echo "Invalid time choice."
+		exit
+	fi
+
+		# Prompt for password to confirm order
+	echo "Enter your sweetgreen password to confirm your order:"
+	read -p "> " password
+
+	fullpath="$(realpath ./api/scheduleOrder.py)"
+
+	(crontab -l && echo "$min $hr $dom $mo $dow python $fullpath $zipCode $locationNo $itemNo $timeNo $password") | crontab -
+
+	echo "$min $hr $dom $mo $dow python $fullpath $zipCode $locationNo $itemNo $timeNo $password" >> ./.sgcli/scheduledOrders
+	echo "Order scheduled"
+}
+
+function performRemoveScheduledOrder() {
+	scheduledOrder="$(cat ./.sgcli/scheduledOrders)"
+	crontab -l | grep -v "$scheduledOrder" | crontab -
+	rm ./.sgcli/scheduledOrders
+
+	echo "Order removed"
 }
 
 function performAddAccount() {
@@ -234,7 +320,7 @@ mkfifo /tmp/sgcli-receive
 cat > /tmp/sgcli-receive &
 receivePid=$!
 
-python runner.py &
+python sgrunner.py &
 
 if [[ $# -eq 0 ]]
 then
@@ -243,6 +329,12 @@ else
 	case ${1} in
 		"--order")
 			performOrder
+			;;
+		"--scheduledOrder")
+			performOrder "-s"
+			;;
+		"--removeScheduledOrder")
+			performRemoveScheduledOrder
 			;;
 		"--addAccount")
 			performAddAccount
@@ -258,3 +350,4 @@ fi
 
 kill $sendPid
 kill $receivePid
+pkill -f sgrunner.py
