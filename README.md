@@ -71,3 +71,6 @@ Additionally, all data other than the password and the salt are encrypted using 
 ### Zack:
 
 I worked primarily on the central shell script, securely saving user data on the computer, and helping Raghav parse Sweetgreen requests/responses and general API.
+
+### Alessandro:
+I focused on the central shell script-- specifically, on implementing user I/O: parsing script flags and implementing the various flag cases, parsing and storing command-line user input, and validating user input and displaying success/error messages.
