@@ -5,23 +5,25 @@ import imp
 import scrape
 from sgorder import Order
 
-saver = imp.load_source('saver', 'saver/secure_saver.py')
-
+saver = imp.load_source('saver', 'saver/secureSaver.py')
 SGOrder = Order()
 
+# Helper function used to interface with sgorder.py
 def getLocationsFromZipCode(zipCode):
     SGOrder.get_location(zipCode)
 
     return ' '.join(SGOrder.locations['name'])
 
+# Helper function used to interface with sgorder.py
 def getMenuFromLocation(locationNo):
-    rest_id = SGOrder.locations['id'][int(locationNo)]
-    menu_items = SGOrder.get_menu(rest_id)
-    options = [i.keys()[0] for i in menu_items['menu']]
-    order_options = [i.replace(" ", "_") for i in options]
+    restId = SGOrder.locations['id'][int(locationNo)]
+    menuItems = SGOrder.get_menu(restId)
+    options = [i.keys()[0] for i in menuItems['menu']]
+    orderOptions = [i.replace(' ', '_') for i in options]
 
-    return ' '.join(order_options)
+    return ' '.join(orderOptions)
 
+# Helper function used to interface with sgorder.py
 def getPickupTimesFromItem(itemNo):
 
     # TODO:
@@ -29,6 +31,7 @@ def getPickupTimesFromItem(itemNo):
 
     return '5:00 5:30 6:00'
 
+# Helper function used to interface with sgorder.py
 def confirmOrder(timeNo, password):
     try:
         SGSaver = saver.SecureSaver(password)
@@ -41,6 +44,8 @@ def confirmOrder(timeNo, password):
     except Exception:
         return '0'
 
+# This function is called whenever data is sent to sgrunner.py via the
+# sgcli.sh -> api/[some function] pipeline.
 def handleRead(data):
     flag = data[0]
 
@@ -83,6 +88,9 @@ def handleRead(data):
         receive_fifo.write(toSend)
         receive_fifo.flush()
 
+# This is the central python runner that simply loops and reads from
+# the opened fifo.  Whenever data has been sent to this function, it handles
+# it.
 def startRunner():
     while True:
         with open('/tmp/sgcli-send', 'r') as send_fifo:

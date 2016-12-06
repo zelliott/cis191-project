@@ -4,6 +4,8 @@ A sweetgreen CLI for ordering from Sweetgreen
 
 Created by: Zack Elliott, Alessandro Portela, Raghav Joshi
 
+Github: https://github.com/zelliott/cis191-project
+
 ## To Run:
 
 *Note: Most of these commands will kick off a series of prompts for you to enter information.*
@@ -48,11 +50,11 @@ $ ./sgcli.sh --removeScheduledOrder
 
 Our team has built a command-line program for ordering from Sweetgreen.  This program includes the following major components:
 
-* Restaurant Location: Logic that either accepts a particular preferred location to order from, or helps the user find the nearest Sweetgreen.
-* Order Processing: Our program must process the order and interact with Sweetgreen’s online checkout portal.
-* Secure Payment and Authentication: Our program will need to securely store all payment and authentication information on the user's computer.
-* Scheduled Orders:  The ability to create a cron job to submit an order at a particular date/time.
-* Command-Line Interface: An easy to understand CLI for specifying all aspects of ordering.  For example, users will be able to specify menu items (e.g. salad types, sides, drinks, etc...), specific customizations, as well as other details of their order (e.g. type of payment, location, special instructions).
+* **Restaurant Location:** Logic that either accepts a particular preferred location to order from, or helps the user find the nearest Sweetgreen.
+* **Order Processing:** Our program must process the order and interact with Sweetgreen’s online checkout portal.
+* **Secure Payment and Authentication:** Our program will need to securely store all payment and authentication information on the user's computer.
+* **Scheduled Orders:**  The ability to create a cron job to submit an order at a particular date/time.
+* **Command-Line Interface:** An easy to understand CLI for specifying all aspects of ordering.  For example, users will be able to specify menu items (e.g. salad types, sides, drinks, etc...), specific customizations, as well as other details of their order (e.g. type of payment, location, special instructions).
 
 *Note:*
 
@@ -60,9 +62,24 @@ Our project proposal changed to ordering from Sweetgreen from ordering to Chipot
 
 ## Project Structure:
 
+Overall program flow can be visualized as follows.  Each individual component is described in more detail below:
+
+```
+1. User calls program: $ ./sgcli.sh [some command flag]
+2. Corresponding action script is run: sgcli.sh --> actions/[some action]
+3. Action script sends data to a Python API endpoint: actions/[some action] --> api/[some request for data]
+4. API endpoint pipes data to central Python process: api/[some request for data] --> sgrunner.py
+5. Central Python process makes a request to Sweetgreen's API: sgrunner.py --> sgorder.py
+6. Order class returns data from Sweetgreen to central runner: sgorder.py --> sgrunner.py
+7. This process pipes response back to API endpoint: sgrunner.py --> api/[some request for data]
+8. Action script grabs output from API endpoint: api/[some request for data] --> actions/[some action]
+9. User is prompted for additional input, and steps 3-8 continue until action is completed.
+```
+
+
 #### sgcli.sh
 
-Our program runs through the shell script `sgcli.sh`, which kicks off all other helping programs/scripts.  First, this script sets up two *named pipes* called `/tmp/sgcli-send` and `/tmp/sgcli-receive`.  These pipes are used by our various Python scripts to communicate to one another.  Second, it kicks off `sgrunner.py` in the background.  Third, it handles all user I/O in our program.  This involves (1) parsing command line arguments such as `--order` and `--addAccount`, (2) reading user input and sending it to the various Python scripts, and (3) validating user input and displaying success/error messages.  Fourth, it handles creating and removing cronjobs for scheduled orders.  Finally, this script cleans up all processes and pipes it creates at the end of running.
+Our program runs through the shell script `sgcli.sh`, which kicks off all other helping programs/scripts.  First, this script sets up two *named pipes* called `/tmp/sgcli-send` and `/tmp/sgcli-receive`.  These pipes are used by our various Python scripts to communicate to one another.  Second, it kicks off `sgrunner.py` in the background.  Third, it handles all user I/O in our program.  This involves (1) parsing command line arguments such as `--order` and `--addAccount`, (2) reading user input and sending it to the various Python scripts, and (3) validating user input and displaying success/error messages.  The various actions/commands that the user can specify have been factored out into the `actions/` directory, for better separation.  Fourth, it handles creating and removing cronjobs for scheduled orders.  Finally, this script cleans up all processes and pipes it creates at the end of running.
 
 #### sgrunner.py
 
@@ -76,7 +93,11 @@ As mentioned above, this script holds all logic regarding making requests to Swe
 
 These Python programs are simply helper methods used by `sgcli.sh` and `sgrunner.py` to send data back and forth through the pipes.  They're not super interesting.
 
-#### saver/secure_saver.py
+#### actions/
+
+These shell scripts hold all of the logic for the various user I/O processes that are managed by `sgcli.sh`.  Depending on what flags our program is called with (i.e. `--order` vs `--addAccount`), a corresponding script from this `actions/` directory is run.
+
+#### saver/secureSaver.py
 
 This Python program handles all aspects of saving and encrypting sensitive account data to the user's computer.  When it is called, it first creates a folder & file `.sgcli/data.json`.  This JSON file will hold all account information needed by our program to submit an order to Sweetgreen (i.e. Sweetgreen account information, credit card data, etc...).
 
@@ -93,6 +114,10 @@ I worked on a number of different pieces, listed below:
 * I created the logic to create and remove cronjobs.
 * I created the helper functions in `api/` to for our shell script to communicate with the the Python class actually interacting with Sweetgreen's API.
 
-
 ### Alessandro:
+
 I focused on the central shell script-- specifically, on implementing user I/O: parsing script flags and implementing the various flag cases, parsing and storing command-line user input, and validating user input and displaying success/error messages.
+
+### Raghav:
+
+TODO

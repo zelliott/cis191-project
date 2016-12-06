@@ -1,12 +1,13 @@
 import requests
 
-LOCATIONS_URL = "https://order.sweetgreen.com/api/restaurants?zip_code="
-MENU_URL = "https://order.sweetgreen.com/api/menus/"
-LINE_URL = "https://order.sweetgreen.com/api/line_items"
-SIGNUP_URL = "https://order.sweetgreen.com/api/customers/login_or_register"
-LOGIN_URL = "https://order.sweetgreen.com/api/customers/login_or_register"
-ORDER_URL = "https://order.sweetgreen.com/api/orders?"
-CHECKOUT_URL = "https://order.sweetgreen.com/api/orders/"
+# Sweetgreen's various API endpoints declared as constants
+LOCATIONS_URL = 'https://order.sweetgreen.com/api/restaurants?zip_code='
+MENU_URL = 'https://order.sweetgreen.com/api/menus/'
+LINE_URL = 'https://order.sweetgreen.com/api/line_items'
+SIGNUP_URL = 'https://order.sweetgreen.com/api/customers/login_or_register'
+LOGIN_URL = 'https://order.sweetgreen.com/api/customers/login_or_register'
+ORDER_URL = 'https://order.sweetgreen.com/api/orders?'
+CHECKOUT_URL = 'https://order.sweetgreen.com/api/orders/'
 
 class Order(object):
     """docstring for Order"""
@@ -45,8 +46,11 @@ class Order(object):
             pwd = params.get('password')
             user = params.get('email')
             payload = 'customer[email]=' + user + '&customer[password]=' + pwd
-            r = s.post(LOGIN_URL, data=payload, headers={"Accept": "application/json",
-                                                         "Content-Type": "application/x-www-form-urlencoded"})
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+            r = s.post(LOGIN_URL, data=payload, headers=headers)
             resp = r.json()
             return resp, resp['session']['csrf']
 
@@ -57,8 +61,11 @@ class Order(object):
             pwd = params.get('password')
             user = params.get('email')
             payload = 'customer[email]=' + user + '&customer[password]=' + pwd
-            r = s.post(LOGIN_URL, data=payload, headers={"Accept": "application/json",
-                                                         "Content-Type": "application/x-www-form-urlencoded"})
+            r = s.post(LOGIN_URL, data=payload, headers=headers)
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
             resp = r.json()  # to get session information (csrf token)
 
             # Add line-item
@@ -70,16 +77,16 @@ class Order(object):
             payload += '&line_item[additions]=' + 'null' + '&line_item[removals]=' + 'null' + '&line_item[order_completed]=' + 'null'
             payload += '&line_item[customer_name]=' + 'null' + '&line_item[ignored_order_id]=' + 'null' + '&line_item[order_id]=' + 'null'
             payload += '&line_item[options]=' + '[]' + '&line_item[restaurant_id]=' + str(rest_id)
-            order = s.post(url=LINE_URL, data=payload, headers={"X-CSRF-TOKEN": resp['session']['csrf']}).json()
+            order = s.post(url=LINE_URL, data=payload, headers={'X-CSRF-TOKEN': resp['session']['csrf']}).json()
 
             # Create order
-            full_url = ORDER_URL + "id=" + str(order['line_item']['ignored_order_id']) + \
-                       "&ignored_product_id=" + str(order['line_item']['product_id'])
+            full_url = ORDER_URL + 'id=' + str(order['line_item']['ignored_order_id']) + \
+                       '&ignored_product_id=' + str(order['line_item']['product_id'])
 
             # Checkout
-            session = s.get(url="https://order.sweetgreen.com/api/session").json()
+            session = s.get(url='https://order.sweetgreen.com/api/session').json()
             checkout = s.get(url=CHECKOUT_URL + str(session['session']['current_order_id']),
-                             headers={"X-CSRF-TOKEN": session['session']['csrf']})
+                             headers={'X-CSRF-TOKEN': session['session']['csrf']})
 
             # Payment
             # final_order = s.post()
