@@ -56,26 +56,25 @@ Our team has built a command-line program for ordering from Sweetgreen.  This pr
 * **Scheduled Orders:**  The ability to create a cron job to submit an order at a particular date/time.
 * **Command-Line Interface:** An easy to understand CLI for specifying all aspects of ordering.  For example, users will be able to specify menu items (e.g. salad types, sides, drinks, etc...), specific customizations, as well as other details of their order (e.g. type of payment, location, special instructions).
 
-*Note:*
+*Notes:*
 
 Our project proposal changed to ordering from Sweetgreen from ordering to Chipotle because Chipotle's online ordering portal was offline for maintenance this last weekend.  Given that our group was not sure when the portal would be back up, we decided that it would be a smart idea to switch to a different restaurant.  We chose Sweetgreen because, although they do not have an "official" API, many of the requests being made on their website are prefixed with `/api/`, and thus it seemed like we would be able to identify which to use.
+
+Additionally, our team has run into some unexpected difficulties placing the final order with Sweetgreen.  Sweetgreen expects that the payment information and the user credentials are encrypted in a certain way.  We are working on reverse-engineering exactly how to create our request payload so that Sweetgreen validates and accepts it.
 
 ## Project Structure:
 
 Overall program flow can be visualized as follows.  Each individual component is described in more detail below:
 
-```
-1. User calls program: $ ./sgcli.sh [some command flag]
-2. Corresponding action script is run: sgcli.sh --> actions/[some action]
-3. Action script sends data to a Python API endpoint: actions/[some action] --> api/[some request for data]
-4. API endpoint pipes data to central Python process: api/[some request for data] --> sgrunner.py
-5. Central Python process makes a request to Sweetgreen's API: sgrunner.py --> sgorder.py
-6. Order class returns data from Sweetgreen to central runner: sgorder.py --> sgrunner.py
-7. This process pipes response back to API endpoint: sgrunner.py --> api/[some request for data]
-8. Action script grabs output from API endpoint: api/[some request for data] --> actions/[some action]
+1. User calls program: `$ ./sgcli.sh [some command flag]`
+2. Corresponding action script is run: `sgcli.sh --> actions/[some action]`
+3. Action script sends data to a Python API endpoint: `actions/[some action] --> api/[some request for data]`
+4. API endpoint pipes data to central Python process: `api/[some request for data] --> sgrunner.py`
+5. Central Python process makes a request to Sweetgreen's API: `sgrunner.py --> sgorder.py`
+6. Order class returns data from Sweetgreen to central runner: `sgorder.py --> sgrunner.py`
+7. This process pipes response back to API endpoint: `sgrunner.py --> api/[some request for data]`
+8. Action script grabs output from API endpoint: `api/[some request for data] --> actions/[some action]`
 9. User is prompted for additional input, and steps 3-8 continue until action is completed.
-```
-
 
 #### sgcli.sh
 
@@ -108,16 +107,19 @@ Additionally, all data other than the password and the salt are encrypted using 
 ### Zack:
 
 I worked on a number of different pieces, listed below:
-* I helped to plan out the general strategy / program flow for this project.  There are a number of different moving pieces (multiple scripts running, making requests to an external API, creating/destroying files, etc...) that needed to be syncronized together properly.
+* I helped to plan out the general strategy / program flow for this project.  There are a number of different moving pieces (multiple scripts running, making requests to an external API, creating/destroying files, etc...) that needed to be synchronized together properly.
 * I helped to create the central `sgcli.sh` runner, including adding logic to read user input, create pipes and spawn background processes, create/destroy cronjobs, validate user input, etc...
 * I created the SecureSaver class in `saver/` to handle securely storing sensitive user information on one's computer.  This turned out to be more difficult than I initially envisioned.
 * I created the logic to create and remove cronjobs.
-* I created the helper functions in `api/` to for our shell script to communicate with the the Python class actually interacting with Sweetgreen's API.
+* I created the helper functions in `api/` to for our shell script to communicate with the Python class actually interacting with Sweetgreen's API.
 
 ### Alessandro:
 
 I focused on the central shell script-- specifically, on implementing user I/O: parsing script flags and implementing the various flag cases, parsing and storing command-line user input, and validating user input and displaying success/error messages.
 
 ### Raghav:
-
-TODO
+I wrote the Order class contained in sgorder.py (originally named scraper.py) which performs all of the Sweetgreen API calls:
+* Given a zip-code, gets the closest sweetgreen locations nearby (provides JSON object containing IDs, addresses, and restaurants)
+* Given a restaurant-id, gets the menu for that particular restaurant
+* Given the user's information (user, password), logs into the account and provides a valid CSRF-token to maintain state across the session
+* Given what was selected by the user (salad, soup, etc), building the line-item / order and creating an order token for checkout
