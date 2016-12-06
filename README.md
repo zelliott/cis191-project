@@ -107,16 +107,19 @@ Additionally, all data other than the password and the salt are encrypted using 
 ### Zack:
 
 I worked on a number of different pieces, listed below:
-* I helped to plan out the general strategy / program flow for this project.  There are a number of different moving pieces (multiple scripts running, making requests to an external API, creating/destroying files, etc...) that needed to be syncronized together properly.
+* I helped to plan out the general strategy / program flow for this project.  There are a number of different moving pieces (multiple scripts running, making requests to an external API, creating/destroying files, etc...) that needed to be synchronized together properly.
 * I helped to create the central `sgcli.sh` runner, including adding logic to read user input, create pipes and spawn background processes, create/destroy cronjobs, validate user input, etc...
 * I created the SecureSaver class in `saver/` to handle securely storing sensitive user information on one's computer.  This turned out to be more difficult than I initially envisioned.
 * I created the logic to create and remove cronjobs.
-* I created the helper functions in `api/` to for our shell script to communicate with the the Python class actually interacting with Sweetgreen's API.
+* I created the helper functions in `api/` to for our shell script to communicate with the Python class actually interacting with Sweetgreen's API.
 
 ### Alessandro:
 
 I focused on the central shell script-- specifically, on implementing user I/O: parsing script flags and implementing the various flag cases, parsing and storing command-line user input, and validating user input and displaying success/error messages.
 
 ### Raghav:
-
-TODO
+I wrote the Order class contained in sgorder.py (originally named scraper.py) which performs all of the Sweetgreen API calls:
+* Given a zip-code, gets the closest sweetgreen locations nearby (provides JSON object containing IDs, addresses, and restaurants)
+* Given a restaurant-id, gets the menu for that particular restaurant
+* Given the user's information (user, password), logs into the account and provides a valid CSRF-token to maintain state across the session
+* Given what was selected by the user (salad, soup, etc), building the line-item / order and creating an order token for checkout
