@@ -64,17 +64,17 @@ Our project proposal changed to ordering from Sweetgreen from ordering to Chipot
 
 Overall program flow can be visualized as follows.  Each individual component is described in more detail below:
 
-```
-1. User calls program: $ ./sgcli.sh [some command flag]
-2. Corresponding action script is run: sgcli.sh --> actions/[some action]
-3. Action script sends data to a Python API endpoint: actions/[some action] --> api/[some request for data]
-4. API endpoint pipes data to central Python process: api/[some request for data] --> sgrunner.py
-5. Central Python process makes a request to Sweetgreen's API: sgrunner.py --> sgorder.py
-6. Order class returns data from Sweetgreen to central runner: sgorder.py --> sgrunner.py
-7. This process pipes response back to API endpoint: sgrunner.py --> api/[some request for data]
-8. Action script grabs output from API endpoint: api/[some request for data] --> actions/[some action]
+
+1. User calls program: `$ ./sgcli.sh [some command flag]`
+2. Corresponding action script is run: `sgcli.sh --> actions/[some action]`
+3. Action script sends data to a Python API endpoint: `actions/[some action] --> api/[some request for data]`
+4. API endpoint pipes data to central Python process: `api/[some request for data] --> sgrunner.py`
+5. Central Python process makes a request to Sweetgreen's API: `sgrunner.py --> sgorder.py`
+6. Order class returns data from Sweetgreen to central runner: `sgorder.py --> sgrunner.py`
+7. This process pipes response back to API endpoint: `sgrunner.py --> api/[some request for data]`
+8. Action script grabs output from API endpoint: `api/[some request for data] --> actions/[some action]`
 9. User is prompted for additional input, and steps 3-8 continue until action is completed.
-```
+
 
 
 #### sgcli.sh
